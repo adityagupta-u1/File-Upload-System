@@ -6,7 +6,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getTable() {
-    return void this.appService.getTable('playing_with_neon');
+  async getTable() {
+    return this.appService.getTable(); // ✅ return result
   }
 }

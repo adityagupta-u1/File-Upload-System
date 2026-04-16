@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { DatabaseService } from './database/db.service';
 
 @Injectable()
 export class AppService {
-  getTable(arg: string) {
-    return arg;
-  }
-  getHello(): string {
-    return 'Hello World!';
+  constructor(private readonly db: DatabaseService) {}
+
+  async getTable() {
+    return this.db.query('SELECT * FROM playing_with_neon');
   }
 }

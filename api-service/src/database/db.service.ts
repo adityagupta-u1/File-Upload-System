@@ -1,13 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Pool, PoolClient } from 'pg';
+import { Pool, QueryResultRow, Submittable } from 'pg';
 
 @Injectable()
-export class AppService {
-  constructor(@Inject('POSTGRES_POOL') private readonly sql: Pool) {}
+export class DatabaseService {
+  constructor(@Inject('POSTGRES_POOL') private readonly pool: Pool) {}
 
-  async getTable(name: string): Promise<Record<string, any>[]> {
-    const client: PoolClient = await this.sql.connect();
-    const { rows } = await client.query(`SELECT * FROM ${name}`);
-    return rows as Record<string, any>[];
+  async query<T extends any[] | QueryResultRow | Submittable>(
+    text: string,
+    params?: unknown[],
+  ): Promise<T[]> {
+    const client = await this.pool.connect();
+
+    try {
+      const result = await client.query<T>(text, params);
+      return result.rows; // ✅ now typed
+    } finally {
+      client.release();
+    }
   }
 }
